@@ -37,8 +37,8 @@ case $1 in
         echo "check network ..." >> /root/start.log
         checkconnect;
         #echo "autossh ..." >> /root/start.log
-        #nohup autossh -M 5678 -NR 19999:localhost:22 root@139.129.33.34 >/dev/null 2>&1 &
-        autossh -M 5678 -4 -N -f root@139.129.33.34 -D 19999:localhost:22 -o "ServerAliveInterval 60″ -o "ServerAliveCountMax 3″ -o BatchMode=yes -o StrictHostKeyChecking=no -i SSH_KEY_FILE_PATH
+        #nohup autossh -M 5678 -NR 19999:localhost:22 root@你的服务器IP >/dev/null 2>&1 &
+        autossh -M 5678 -4 -N -f root@你的服务器IP -D 19999:localhost:22 -o "ServerAliveInterval 60″ -o "ServerAliveCountMax 3″ -o BatchMode=yes -o StrictHostKeyChecking=no -i SSH_KEY_FILE_PATH
         nohup python /root/weather/weather_service.py >/dev/null 2>&1 &
         echo "service started" >> /root/start.log
         date '+%Y-%m-%d %T' >> /root/start.log

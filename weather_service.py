@@ -15,7 +15,7 @@ import StringIO
 import traceback
 from wave_share_43inch_epaper import *
 
-SERVER_URL = "http://139.129.33.34/ios_dev/IOSSportsPages/admin.php/Index/python_url"
+SERVER_URL = "http://你的服务器提供的API地址”
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
@@ -45,7 +45,7 @@ class WeatherService(threading.Thread):
         threading.Thread.__init__(self)
         self.init = False
         self.city = None
-        self.word = "zhujun presented to qiuting."
+        self.word = “hello world.”
         self.weather = None
         self.screen = None
         self.summary = "today is a good day"
@@ -353,7 +353,7 @@ class WeatherService(threading.Thread):
             try:
                 req = urllib2.Request(weather_url)
                 #api key
-                req.add_header("apikey", "dd46cab48a38ae48e6c209a79ef75540")
+                req.add_header("apikey", “你自己的百度API STORE 的APPKEY”)
                 html = urllib2.urlopen(req).read().decode('utf-8')
                 json_datas = json.loads(html)
                 json_datas = json_datas["HeWeather data service 3.0"][0]
