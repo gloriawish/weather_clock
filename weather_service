@@ -1,0 +1,57 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          weather_service
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start or stop the weather service
+### END INIT INFO
+case $1 in
+    start)
+        checkconnect() {
+            #超时时间
+            timeout=5
+            target=www.baidu.com
+            while :
+            do
+                #获取响应状态码
+                ret_code=`curl -I -s --connect-timeout $timeout $target -w %{http_code} | tail -n1`
+
+                if [ "x$ret_code" = "x200" ]; then
+                    #网络畅通
+                    echo "network ok." >> /root/start.log
+                    break
+                else
+                    #网络不畅通
+                    date '+%Y-%m-%d %T' >> /root/start.log
+                    echo "network not connect." > /root/start.log
+                    python /root/weather/display_error.py
+                    sleep 5
+                fi
+            done
+        }
+        date '+%Y-%m-%d %T' >> /root/start.log
+        echo "wake up e-paper ..."
+        python /root/weather/wake_up.py
+        echo "check network ..." >> /root/start.log
+        checkconnect;
+        #echo "autossh ..." >> /root/start.log
+        #nohup autossh -M 5678 -NR 19999:localhost:22 root@139.129.33.34 >/dev/null 2>&1 &
+        autossh -M 5678 -4 -N -f root@139.129.33.34 -D 19999:localhost:22 -o "ServerAliveInterval 60″ -o "ServerAliveCountMax 3″ -o BatchMode=yes -o StrictHostKeyChecking=no -i SSH_KEY_FILE_PATH
+        nohup python /root/weather/weather_service.py >/dev/null 2>&1 &
+        echo "service started" >> /root/start.log
+        date '+%Y-%m-%d %T' >> /root/start.log
+        ;;
+    stop)
+        echo "e-paper sleep ..." >> /root/start.log
+        python /root/weather/sleep.py
+        sleep 1
+        echo "kill autossh..." >> /root/start.log
+        ps -ef | grep autossh | grep -v grep | awk '{print $2}' | xargs kill -9
+        echo "service stop" >> /root/start.log
+        ;;
+    *)
+        echo "Usage: $0 (start|stop)"
+    ;;
+esac
